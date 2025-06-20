@@ -1,0 +1,56 @@
+﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:WarehouseApp.MAUI.ViewModels"
+             xmlns:core="clr-namespace:WarehouseApp.Core;assembly=WarehouseApp.Core"
+             x:Class="WarehouseApp.MAUI.Pages.CartPage"
+             Title="Koszyk">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="10" Spacing="10">
+
+            <Button Text="⬅️ Wróć do zakupów"
+                    Clicked="OnBackToShopClicked"
+                    BackgroundColor="LightGray"
+                    CornerRadius="10" />
+
+            <CollectionView x:Name="CartView">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:CartItemViewModel">
+                        <Frame BorderColor="LightGray" CornerRadius="10" Padding="10" Margin="5">
+                            <VerticalStackLayout>
+
+                                <Image Source="{Binding Item.ImageUrl}"
+                                       HeightRequest="160"
+                                       Aspect="AspectFit"
+                                       Margin="0,0,0,10"/>
+
+                                <Label Text="{Binding Item.Name}" FontAttributes="Bold" FontSize="18" />
+                                <Label Text="{Binding Item.Description}" FontSize="14" />
+
+                                <HorizontalStackLayout Spacing="10">
+                                    <Label Text="Ilość:" VerticalOptions="Center" />
+                                    <Stepper Minimum="1"
+                                             Maximum="{Binding Item.Quantity}"
+                                             Value="{Binding Count}"
+                                             Increment="1"
+                                             ValueChanged="OnStepperValueChanged" />
+                                    <Label Text="{Binding Count}" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+
+                                <Button Text="🗑 Usuń z koszyka"
+                                        Clicked="OnRemoveClicked"
+                                        BackgroundColor="LightCoral" />
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Button Text="💸 Kup wszystko"
+                    Clicked="OnPurchaseClicked"
+                    BackgroundColor="LightGreen"
+                    CornerRadius="10" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

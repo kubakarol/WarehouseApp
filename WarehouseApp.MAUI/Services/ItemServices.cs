@@ -42,10 +42,10 @@ namespace WarehouseApp.MAUI.Services
         }
 
 
-        public async Task<bool> UpdateItemAsync(Item item)
+        public async Task UpdateItemAsync(Item item)
         {
-            var response = await _httpClient.PutAsJsonAsync($"{BaseUrl}/{item.Id}", item);
-            return response.IsSuccessStatusCode;
+            var response = await _httpClient.PutAsJsonAsync($"api/Item/{item.Id}", item);
+            response.EnsureSuccessStatusCode();
         }
 
         public async Task<bool> DeleteItemAsync(int id)

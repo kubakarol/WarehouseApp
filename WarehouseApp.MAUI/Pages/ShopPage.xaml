@@ -5,36 +5,45 @@
              x:Class="WarehouseApp.MAUI.Pages.ShopPage"
              Title="Shop"
              x:DataType="vm:InventoryViewModel">
-    <ScrollView>
-	<VerticalStackLayout Padding="10" Spacing="10">
-		<HorizontalStackLayout Spacing="10">
-			<Button Text="🚪 Wyloguj"
-                    Clicked="OnLogoutClicked"
-                    BackgroundColor="LightPink"
-                    CornerRadius="10"
-                    HorizontalOptions="FillAndExpand" />
-            <Button Text="🛒 Koszyk"
-					Clicked="OnCartClicked"
-					CornerRadius="10"
-					BackgroundColor="LightBlue"
-					HorizontalOptions="FillAndExpand" />
-		</HorizontalStackLayout>
 
-		<CollectionView ItemsSource="{Binding Items}">
-			<CollectionView.ItemTemplate>
-				<DataTemplate x:DataType="core:Item">
-					<Frame BorderColor="LightGray" CornerRadius="8" Padding="10" Margin="10">
-						<VerticalStackLayout>
-							<Image Source="{Binding ImageUrl}" HeightRequest="150" Aspect="AspectFill"/>
-							<Label Text="{Binding Name}" FontAttributes="Bold" FontSize="18"/>
-							<Label Text="{Binding Description}" FontSize="13" TextColor="Gray"/>
-							<Label Text="{Binding Quantity, StringFormat='Ilość: {0}'}" FontSize="12" TextColor="DarkGray"/>
-							<Button Text="➕ Dodaj do koszyka" Clicked="OnAddToCartClicked" />
-						</VerticalStackLayout>
-					</Frame>
-				</DataTemplate>
-			</CollectionView.ItemTemplate>
-		</CollectionView>
-	</VerticalStackLayout>
+    <ScrollView>
+        <VerticalStackLayout Padding="10" Spacing="10">
+
+            <HorizontalStackLayout Spacing="10">
+                <Button Text="🚪 Wyloguj"
+                        Clicked="OnLogoutClicked"
+                        BackgroundColor="LightPink"
+                        CornerRadius="10"
+                        HorizontalOptions="FillAndExpand" />
+                <Button Text="🛒 Koszyk"
+                        Clicked="OnCartClicked"
+                        CornerRadius="10"
+                        BackgroundColor="LightBlue"
+                        HorizontalOptions="FillAndExpand" />
+            </HorizontalStackLayout>
+
+            <CollectionView ItemsSource="{Binding Items}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="core:Item">
+                        <Frame BorderColor="LightGray" CornerRadius="8" Padding="10" Margin="10">
+                            <VerticalStackLayout>
+
+                                <Image Source="{Binding ImageUrl}" 
+                                       HeightRequest="180" 
+                                       Aspect="AspectFit" 
+                                       Margin="0,0,0,10"/>
+
+                                <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="18"/>
+                                <Label Text="{Binding Description}" FontSize="13" TextColor="Gray"/>
+                                <Label Text="{Binding Quantity, StringFormat='Ilość: {0}'}" FontSize="12" TextColor="DarkGray"/>
+                                <Button Text="➕ Dodaj do koszyka" Clicked="OnAddToCartClicked" />
+
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

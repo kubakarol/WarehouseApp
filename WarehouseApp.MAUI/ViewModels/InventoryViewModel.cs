@@ -13,7 +13,10 @@ namespace WarehouseApp.MAUI.ViewModels
 
         public InventoryViewModel()
         {
-            _itemService = new ItemService(new HttpClient());
+            _itemService = new ItemService(new HttpClient
+            {
+                BaseAddress = new Uri("https://localhost:7073")
+            });
             LoadItemsAsync();
         }
 
@@ -25,11 +28,6 @@ namespace WarehouseApp.MAUI.ViewModels
                 Items.Add(item);
         }
 
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-        void OnPropertyChanged([CallerMemberName] string name = "") =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-
         public void RefreshItem(Item item)
         {
             var index = Items.IndexOf(item);
@@ -40,5 +38,8 @@ namespace WarehouseApp.MAUI.ViewModels
             }
         }
 
+        public event PropertyChangedEventHandler? PropertyChanged;
+        void OnPropertyChanged([CallerMemberName] string name = "") =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }

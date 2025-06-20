@@ -6,9 +6,7 @@ namespace WarehouseApp.MAUI.Pages;
 public partial class ShopPage : ContentPage
 {
     private readonly InventoryViewModel _viewModel;
-
-    // Koszyk
-    private readonly List<Item> _cart = new();
+    private readonly List<(Item item, int count)> _cart = new();
 
     public ShopPage()
     {
@@ -23,8 +21,17 @@ public partial class ShopPage : ContentPage
         {
             if (item.Quantity > 0)
             {
-                item.Quantity--;
-                _cart.Add(item);
+                var existing = _cart.FirstOrDefault(i => i.item.Id == item.Id);
+                if (_cart.Any(i => i.item.Id == item.Id))
+                {
+                    int index = _cart.FindIndex(i => i.item.Id == item.Id);
+                    _cart[index] = (_cart[index].item, _cart[index].count + 1);
+                }
+                else
+                {
+                    _cart.Add((item, 1));
+                }
+
                 _viewModel.RefreshItem(item);
 
                 await DisplayAlert("Koszyk", $"Dodano: {item.Name}", "OK");
@@ -44,8 +51,13 @@ public partial class ShopPage : ContentPage
 
     private async void OnCartClicked(object sender, EventArgs e)
     {
-        var count = _cart.Count;
-        await DisplayAlert("Koszyk", $"Masz {count} produktów w koszyku.", "OK");
+        await Shell.Current.Navigation.PushAsync(new CartPage(_cart));
+    }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        await _viewModel.LoadItemsAsync();
     }
 
 }
