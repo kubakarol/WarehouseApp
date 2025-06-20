@@ -27,11 +27,20 @@ namespace WarehouseApp.MAUI.Services
             }
         }
 
-        public async Task<bool> AddItemAsync(Item item)
+        public async Task<bool> AddItemAsync(MultipartFormDataContent content)
         {
-            var response = await _httpClient.PostAsJsonAsync(BaseUrl, item);
-            return response.IsSuccessStatusCode;
+            try
+            {
+                var response = await _httpClient.PostAsync(BaseUrl, content);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Błąd wysyłania: {ex.Message}");
+                return false;
+            }
         }
+
 
         public async Task<bool> UpdateItemAsync(Item item)
         {

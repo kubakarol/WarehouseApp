@@ -1,34 +1,40 @@
 ﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:WarehouseApp.MAUI.ViewModels"
+             xmlns:core="clr-namespace:WarehouseApp.Core;assembly=WarehouseApp.Core"
              x:Class="WarehouseApp.MAUI.Pages.InventoryPage"
-             Title="Stan magazynu"
+             Title="Inventory"
              x:DataType="vm:InventoryViewModel">
-
-    <VerticalStackLayout Padding="20">
-
-        <Button Text="Wyloguj" Clicked="OnLogoutClicked" />
+    <ScrollView>
+    <VerticalStackLayout Padding="10" Spacing="10">
+        <HorizontalStackLayout Spacing="10">
+            <Button Text="➕ Dodaj produkt"
+                    Clicked="OnAddItemClicked"
+                    BackgroundColor="LightGreen"
+                    CornerRadius="10"
+                    HorizontalOptions="FillAndExpand" />
+            <Button Text="🚪 Wyloguj"
+                    Clicked="OnLogoutClicked"
+                    BackgroundColor="LightPink"
+                    CornerRadius="10"
+                    HorizontalOptions="FillAndExpand" />
+        </HorizontalStackLayout>
 
         <CollectionView ItemsSource="{Binding Items}">
             <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Frame BorderColor="Gray" Padding="10" Margin="5">
-                        <VerticalStackLayout>
-                            <Label Text="{Binding Name}" FontAttributes="Bold" />
-                            <Label Text="{Binding Description}" />
-                            <Label>
-                                <Label.FormattedText>
-                                    <FormattedString>
-                                        <Span Text="Ilość: " />
-                                        <Span Text="{Binding Quantity}" />
-                                    </FormattedString>
-                                </Label.FormattedText>
-                            </Label>
+                <DataTemplate x:DataType="core:Item">
+                    <Frame BorderColor="LightGray" CornerRadius="12" Margin="5" Padding="10">
+                        <VerticalStackLayout Spacing="5">
+                            <Image Source="{Binding ImageUrl}" HeightRequest="150" Aspect="AspectFill" />
+                            <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="16" />
+                            <Label Text="{Binding Description}" FontSize="12" TextColor="Gray" />
+                            <ProgressBar Progress="{Binding Quantity, Converter={StaticResource QuantityToProgressConverter}}" />
+                            <Label Text="{Binding Quantity, StringFormat='Ilość: {0}'}" FontSize="12" />
                         </VerticalStackLayout>
                     </Frame>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
-
     </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

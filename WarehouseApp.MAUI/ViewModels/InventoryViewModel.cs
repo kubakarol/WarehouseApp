@@ -14,10 +14,10 @@ namespace WarehouseApp.MAUI.ViewModels
         public InventoryViewModel()
         {
             _itemService = new ItemService(new HttpClient());
-            LoadItems();
+            LoadItemsAsync();
         }
 
-        private async void LoadItems()
+        public async Task LoadItemsAsync()
         {
             var items = await _itemService.GetItemsAsync();
             Items.Clear();
@@ -25,8 +25,20 @@ namespace WarehouseApp.MAUI.ViewModels
                 Items.Add(item);
         }
 
+
         public event PropertyChangedEventHandler? PropertyChanged;
         void OnPropertyChanged([CallerMemberName] string name = "") =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+        public void RefreshItem(Item item)
+        {
+            var index = Items.IndexOf(item);
+            if (index >= 0)
+            {
+                Items.RemoveAt(index);
+                Items.Insert(index, item);
+            }
+        }
+
     }
 }

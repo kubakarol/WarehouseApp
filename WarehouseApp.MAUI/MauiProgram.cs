@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using WarehouseApp.MAUI.ViewModels;
 
 namespace WarehouseApp.MAUI
 {
@@ -17,6 +18,8 @@ namespace WarehouseApp.MAUI
 
 #if DEBUG
     		builder.Logging.AddDebug();
+            builder.Services.AddTransient<AddItemViewModel>();
+
 #endif
 
             return builder.Build();
