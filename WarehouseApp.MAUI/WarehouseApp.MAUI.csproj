@@ -66,4 +66,8 @@
 	  <ProjectReference Include="..\WarehouseApp.Core\WarehouseApp.Core.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Platforms\Android\assets\" />
+	</ItemGroup>
+
 </Project>
