@@ -4,12 +4,17 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:WarehouseApp.MAUI"
+    xmlns:pages="clr-namespace:WarehouseApp.MAUI.Pages"
     Shell.FlyoutBehavior="Disabled"
     Title="WarehouseApp.MAUI">
+
+    <ShellContent Route="LoginPage" ContentTemplate="{DataTemplate pages:LoginPage}" />
+    <ShellContent Route="RegisterPage" ContentTemplate="{DataTemplate pages:RegisterPage}" />
+    <ShellContent Route="InventoryPage" ContentTemplate="{DataTemplate pages:InventoryPage}" />
+    <ShellContent Route="ShopPage" ContentTemplate="{DataTemplate pages:ShopPage}" />
 
     <ShellContent
         Title="Home"
         ContentTemplate="{DataTemplate local:MainPage}"
         Route="MainPage" />
-
 </Shell>
