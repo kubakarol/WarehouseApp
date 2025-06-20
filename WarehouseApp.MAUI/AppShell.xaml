@@ -14,6 +14,8 @@
     <ShellContent Route="ShopPage" ContentTemplate="{DataTemplate pages:ShopPage}" />
     <ShellContent Route="AddItemPage" ContentTemplate="{DataTemplate pages:AddItemPage}" />
     <ShellContent Route="CartPage" ContentTemplate="{DataTemplate pages:CartPage}" />
+    <ShellContent Route="AddItemPage" ContentTemplate="{DataTemplate pages:AddItemPage}" />
+
 
 
 

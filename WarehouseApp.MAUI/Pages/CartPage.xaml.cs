@@ -15,13 +15,12 @@ public partial class CartPage : ContentPage
         BaseAddress = new Uri("https://localhost:7073")
     });
 
-    public CartPage(List<(Item Item, int Count)> cart)
+    public CartPage()
     {
         InitializeComponent();
         _cart = new ObservableCollection<CartItemViewModel>(
-            cart.Select(c => new CartItemViewModel(c.Item, c.Count))
+            CartStore.Cart.Select(c => new CartItemViewModel(c.Item, c.Count))
         );
-
         CartView.ItemsSource = _cart;
     }
 
@@ -39,6 +38,7 @@ public partial class CartPage : ContentPage
         {
             vm.Item.Quantity += vm.Count;
             _cart.Remove(vm);
+            CartStore.Cart.RemoveAll(c => c.Item.Id == vm.Item.Id);
             await DisplayAlert("Usunięto", $"Usunięto {vm.Item.Name}", "OK");
         }
     }
@@ -50,16 +50,28 @@ public partial class CartPage : ContentPage
 
         foreach (var vm in _cart)
         {
+            if (vm.Count > vm.Item.Quantity)
+            {
+                await DisplayAlert("Błąd", $"Nie ma wystarczającej ilości produktu: {vm.Item.Name}", "OK");
+                return;
+            }
+        }
+
+        foreach (var vm in _cart)
+        {
             vm.Item.Quantity -= vm.Count;
             await _service.UpdateItemAsync(vm.Item);
         }
 
         try { Vibration.Default.Vibrate(300); } catch { }
 
+        CartStore.Clear();
         _cart.Clear();
+
         await DisplayAlert("Sukces", "Zakup zakończony", "OK");
         await Shell.Current.GoToAsync("//ShopPage");
     }
+
 
     private async void OnBackToShopClicked(object sender, EventArgs e)
     {

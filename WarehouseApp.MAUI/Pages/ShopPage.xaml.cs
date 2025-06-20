@@ -1,12 +1,12 @@
 ﻿using WarehouseApp.MAUI.ViewModels;
 using WarehouseApp.Core;
+using WarehouseApp.MAUI.Services;
 
 namespace WarehouseApp.MAUI.Pages;
 
 public partial class ShopPage : ContentPage
 {
     private readonly InventoryViewModel _viewModel;
-    private readonly List<(Item item, int count)> _cart = new();
 
     public ShopPage()
     {
@@ -21,19 +21,18 @@ public partial class ShopPage : ContentPage
         {
             if (item.Quantity > 0)
             {
-                var existing = _cart.FirstOrDefault(i => i.item.Id == item.Id);
-                if (_cart.Any(i => i.item.Id == item.Id))
+                var existing = CartStore.Cart.FirstOrDefault(i => i.Item.Id == item.Id);
+                if (CartStore.Cart.Any(i => i.Item.Id == item.Id))
                 {
-                    int index = _cart.FindIndex(i => i.item.Id == item.Id);
-                    _cart[index] = (_cart[index].item, _cart[index].count + 1);
+                    int index = CartStore.Cart.FindIndex(i => i.Item.Id == item.Id);
+                    CartStore.Cart[index] = (CartStore.Cart[index].Item, CartStore.Cart[index].Count + 1);
                 }
                 else
                 {
-                    _cart.Add((item, 1));
+                    CartStore.Cart.Add((item, 1));
                 }
 
                 _viewModel.RefreshItem(item);
-
                 await DisplayAlert("Koszyk", $"Dodano: {item.Name}", "OK");
             }
             else
@@ -51,7 +50,7 @@ public partial class ShopPage : ContentPage
 
     private async void OnCartClicked(object sender, EventArgs e)
     {
-        await Shell.Current.Navigation.PushAsync(new CartPage(_cart));
+        await Shell.Current.Navigation.PushAsync(new CartPage());
     }
 
     protected override async void OnAppearing()
@@ -59,5 +58,4 @@ public partial class ShopPage : ContentPage
         base.OnAppearing();
         await _viewModel.LoadItemsAsync();
     }
-
 }

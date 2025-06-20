@@ -12,7 +12,8 @@
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Tu dokładamy inne zasoby -->
-            <conv:QuantityToProgressConverter x:Key="QuantityToProgressConverter"/>
+
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

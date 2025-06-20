@@ -41,5 +41,16 @@ namespace WarehouseApp.MAUI.ViewModels
         public event PropertyChangedEventHandler? PropertyChanged;
         void OnPropertyChanged([CallerMemberName] string name = "") =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+        public void DecreaseItemQuantity(int itemId, int count)
+        {
+            var item = Items.FirstOrDefault(i => i.Id == itemId);
+            if (item != null)
+            {
+                item.Quantity -= count;
+                RefreshItem(item);
+            }
+        }
+
     }
 }

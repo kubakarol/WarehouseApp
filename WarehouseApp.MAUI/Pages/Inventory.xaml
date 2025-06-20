@@ -1,40 +1,41 @@
-﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:WarehouseApp.MAUI.ViewModels"
              xmlns:core="clr-namespace:WarehouseApp.Core;assembly=WarehouseApp.Core"
              x:Class="WarehouseApp.MAUI.Pages.InventoryPage"
-             Title="Inventory"
-             x:DataType="vm:InventoryViewModel">
-    <ScrollView>
-    <VerticalStackLayout Padding="10" Spacing="10">
-        <HorizontalStackLayout Spacing="10">
-            <Button Text="➕ Dodaj produkt"
-                    Clicked="OnAddItemClicked"
-                    BackgroundColor="LightGreen"
-                    CornerRadius="10"
-                    HorizontalOptions="FillAndExpand" />
-            <Button Text="🚪 Wyloguj"
-                    Clicked="OnLogoutClicked"
-                    BackgroundColor="LightPink"
-                    CornerRadius="10"
-                    HorizontalOptions="FillAndExpand" />
-        </HorizontalStackLayout>
+             x:DataType="vm:InventoryViewModel"
+             Title="Inventory">
 
-        <CollectionView ItemsSource="{Binding Items}">
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="core:Item">
-                    <Frame BorderColor="LightGray" CornerRadius="12" Margin="5" Padding="10">
-                        <VerticalStackLayout Spacing="5">
-                            <Image Source="{Binding ImageUrl}" HeightRequest="150" Aspect="AspectFill" />
-                            <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="16" />
-                            <Label Text="{Binding Description}" FontSize="12" TextColor="Gray" />
-                            <ProgressBar Progress="{Binding Quantity, Converter={StaticResource QuantityToProgressConverter}}" />
-                            <Label Text="{Binding Quantity, StringFormat='Ilość: {0}'}" FontSize="12" />
-                        </VerticalStackLayout>
-                    </Frame>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-    </VerticalStackLayout>
+    <ScrollView>
+        <VerticalStackLayout Padding="10" Spacing="10">
+            <HorizontalStackLayout Spacing="10">
+                <Button Text="➕ Dodaj produkt"
+                        Clicked="OnAddItemClicked"
+                        BackgroundColor="LightGreen"
+                        CornerRadius="10"
+                        HorizontalOptions="FillAndExpand" />
+                <Button Text="🚪 Wyloguj"
+                        Clicked="OnLogoutClicked"
+                        BackgroundColor="LightPink"
+                        CornerRadius="10"
+                        HorizontalOptions="FillAndExpand" />
+            </HorizontalStackLayout>
+
+            <CollectionView ItemsSource="{Binding Items}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="core:Item">
+                        <Frame BorderColor="LightGray" CornerRadius="12" Margin="5" Padding="10">
+                            <VerticalStackLayout Spacing="5">
+                                <Image Source="{Binding ImageUrl}" HeightRequest="150" Aspect="AspectFill" />
+                                <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="16" />
+                                <Label Text="{Binding Description}" FontSize="12" TextColor="Gray" />
+                                <Label Text="{Binding Quantity, StringFormat='Ilość: {0}'}" FontSize="12" />
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

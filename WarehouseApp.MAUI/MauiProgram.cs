@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using WarehouseApp.MAUI.ViewModels;
+using WarehouseApp.MAUI.Pages;
 
 namespace WarehouseApp.MAUI
 {
@@ -17,10 +18,12 @@ namespace WarehouseApp.MAUI
                 });
 
 #if DEBUG
-    		builder.Logging.AddDebug();
-            builder.Services.AddTransient<AddItemViewModel>();
-
+            builder.Logging.AddDebug();
 #endif
+
+            // Rejestracja tylko ViewModel i strony magazynowej
+            builder.Services.AddSingleton<InventoryViewModel>();
+            builder.Services.AddSingleton<InventoryPage>();
 
             return builder.Build();
         }
