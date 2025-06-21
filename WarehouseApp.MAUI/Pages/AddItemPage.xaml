@@ -18,6 +18,7 @@
 
             <Image Source="{Binding Image}" HeightRequest="150" />
             <Button Text="Zdjęcie" Command="{Binding TakePhotoCommand}" />
+            <Button Text="Wybierz zdjęcie" Command="{Binding PickPhotoCommand}" />
             <Button Text="Zapisz"  Command="{Binding SaveCommand}" />
         </VerticalStackLayout>
     </ScrollView>

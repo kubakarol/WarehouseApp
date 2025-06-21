@@ -16,9 +16,9 @@ namespace WarehouseApp.MAUI.ViewModels
         public ICommand LoginCommand { get; }
         public ICommand GoToRegisterCommand { get; }
 
-        public LoginViewModel()
+        public LoginViewModel(AuthService authService)
         {
-            _authService = new AuthService(new HttpClient());
+            _authService = authService;
             LoginCommand = new Command(async () => await Login());
             GoToRegisterCommand = new Command(async () => await Shell.Current.GoToAsync("//RegisterPage"));
         }

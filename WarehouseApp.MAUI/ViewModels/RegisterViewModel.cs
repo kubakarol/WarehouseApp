@@ -4,34 +4,38 @@ using WarehouseApp.Core;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace WarehouseApp.MAUI.ViewModels
+namespace WarehouseApp.MAUI.ViewModels;
+
+public class RegisterViewModel : INotifyPropertyChanged
 {
-    public class RegisterViewModel : INotifyPropertyChanged
+    private readonly AuthService _authService;
+
+    public string Username { get; set; } = "";
+    public string Password { get; set; } = "";
+    public string SelectedRole { get; set; } = "Client";
+
+    public ICommand RegisterCommand { get; }
+    public ICommand GoToLoginCommand { get; }
+
+    public RegisterViewModel(AuthService authService)
     {
-        private readonly AuthService _authService;
+        _authService = authService;
+        RegisterCommand = new Command(async () => await Register());
+        GoToLoginCommand = new Command(async () => await Shell.Current.GoToAsync("//LoginPage"));
+    }
 
-        public string Username { get; set; } = "";
-        public string Password { get; set; } = "";
-        public string SelectedRole { get; set; } = "Client";
-
-        public ICommand RegisterCommand { get; }
-        public ICommand GoToLoginCommand { get; }
-
-        public RegisterViewModel()
+    private async Task Register()
+    {
+        var user = new User
         {
-            _authService = new AuthService(new HttpClient());
-            RegisterCommand = new Command(async () => await Register());
-            GoToLoginCommand = new Command(async () => await Shell.Current.GoToAsync("//LoginPage"));
-        }
+            Username = Username,
+            Password = Password,
+            Role = SelectedRole
+        };
 
-        private async Task Register()
+        try 
         {
-            var user = new User
-            {
-                Username = Username,
-                Password = Password,
-                Role = SelectedRole
-            };
+            Console.WriteLine("[DOTNET] [🔁] Sending register request to auth/register");
 
             var success = await _authService.RegisterAsync(user);
             if (success)
@@ -44,9 +48,14 @@ namespace WarehouseApp.MAUI.ViewModels
                 await Application.Current.MainPage.DisplayAlert("Błąd", "Użytkownik już istnieje", "OK");
             }
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        void OnPropertyChanged([CallerMemberName] string name = "") =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"[DOTNET] [❌] HttpRequestException during registration: {ex.Message}");
+            await Application.Current.MainPage.DisplayAlert("Błąd połączenia", "Nie można połączyć się z serwerem", "OK");
+        }
     }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+    void OnPropertyChanged([CallerMemberName] string name = "") =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }

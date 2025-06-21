@@ -13,7 +13,20 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<WarehouseDbContext>(options =>
     options.UseSqlite("Data Source=warehouse.db"));
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(7073);
+
+});
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
+
+
+
 
 
 
@@ -25,7 +38,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

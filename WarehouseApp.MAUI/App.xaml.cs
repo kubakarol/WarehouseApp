@@ -9,19 +9,22 @@ public partial class App : Application
     {
         InitializeComponent();
         MainPage = new AppShell();
+    }
+
+    protected override void OnStart()
+    {
+        base.OnStart();
 
         var role = Preferences.Get("Role", "");
-        if (string.IsNullOrEmpty(role))
+        MainThread.BeginInvokeOnMainThread(async () =>
         {
-            Shell.Current.GoToAsync("//LoginPage");
-        }
-        else if (role == "Employee")
-        {
-            Shell.Current.GoToAsync("//InventoryPage");
-        }
-        else
-        {
-            Shell.Current.GoToAsync("//ShopPage");
-        }
+            if (string.IsNullOrEmpty(role))
+                await Shell.Current.GoToAsync("//LoginPage");
+            else if (role == "Employee")
+                await Shell.Current.GoToAsync("//InventoryPage");
+            else
+                await Shell.Current.GoToAsync("//ShopPage");
+        });
     }
 }
+

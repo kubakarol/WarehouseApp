@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WarehouseApp.MAUI.ViewModels;
 
 namespace WarehouseApp.MAUI.Pages;
 
 public partial class RegisterPage : ContentPage
 {
-    public RegisterPage()
+    public RegisterPage(RegisterViewModel vm)
     {
         InitializeComponent();
-        BindingContext = new ViewModels.RegisterViewModel();
+        BindingContext = vm;
     }
 }
 

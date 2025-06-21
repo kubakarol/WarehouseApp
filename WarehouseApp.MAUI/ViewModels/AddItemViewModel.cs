@@ -17,6 +17,7 @@ public partial class AddItemViewModel : ObservableObject
     private string? _imagePath;
 
     public IAsyncRelayCommand TakePhotoCommand { get; }
+    public IAsyncRelayCommand PickPhotoCommand { get; }
     public IAsyncRelayCommand SaveCommand { get; }
 
     private readonly ItemService _items;
@@ -28,31 +29,64 @@ public partial class AddItemViewModel : ObservableObject
         _toast = toast;
 
         TakePhotoCommand = new AsyncRelayCommand(TakePhotoAsync);
+        PickPhotoCommand = new AsyncRelayCommand(PickPhotoAsync);
         SaveCommand = new AsyncRelayCommand(SaveAsync);
     }
 
     public AddItemViewModel()
-        : this(new ItemService(new HttpClient { BaseAddress = new Uri("https://localhost:7073/api/") }),
+   //     : this(new ItemService(new HttpClient { BaseAddress = new Uri("https://localhost:7073/api/") }),
+   : this(new ItemService(new HttpClient { BaseAddress = new Uri("https://10.0.2.2:7073/api/") }),
                new NotificationService())
     { }
 
     private async Task TakePhotoAsync()
     {
-        FileResult? result = null;
-
+        try
+        {
 #if ANDROID || IOS
-        result = await MediaPicker.CapturePhotoAsync();
-#elif WINDOWS
-        result = await FilePicker.Default.PickAsync(new PickOptions
-        {
-            PickerTitle = "Wybierz zdjęcie",
-            FileTypes = FilePickerFileType.Images
-        });
+            var status = await Permissions.RequestAsync<Permissions.Camera>();
+            if (status != PermissionStatus.Granted)
+            {
+                await _toast.ErrorAsync("Brak uprawnień do aparatu");
+                return;
+            }
+
+            var result = await MediaPicker.CapturePhotoAsync();
+
+            if (result != null)
+            {
+                _imagePath = result.FullPath;
+                Image = ImageSource.FromFile(_imagePath);
+            }
+#else
+            await _toast.ErrorAsync("Robienie zdjęć działa tylko na urządzeniu mobilnym.");
 #endif
-        if (result is not null)
+        }
+        catch (Exception ex)
         {
-            _imagePath = result.FullPath;
-            Image = ImageSource.FromFile(_imagePath);
+            await _toast.ErrorAsync("Nie udało się zrobić zdjęcia: " + ex.Message);
+        }
+    }
+
+    private async Task PickPhotoAsync()
+    {
+        try
+        {
+            var result = await FilePicker.Default.PickAsync(new PickOptions
+            {
+                PickerTitle = "Wybierz zdjęcie",
+                FileTypes = FilePickerFileType.Images
+            });
+
+            if (result != null)
+            {
+                _imagePath = result.FullPath;
+                Image = ImageSource.FromFile(_imagePath);
+            }
+        }
+        catch (Exception ex)
+        {
+            await _toast.ErrorAsync("Błąd przy wyborze zdjęcia: " + ex.Message);
         }
     }
 
@@ -95,7 +129,6 @@ public partial class AddItemViewModel : ObservableObject
 
             ResetFields();
 
-            // ABSOLUTNA trasa + parametr, aby InventoryPage wywołał LoadAsync()
             await MainThread.InvokeOnMainThreadAsync(() =>
                 Shell.Current.GoToAsync("//InventoryPage"));
         }

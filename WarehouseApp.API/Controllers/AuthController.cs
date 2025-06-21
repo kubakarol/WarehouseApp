@@ -17,7 +17,7 @@ namespace WarehouseApp.API.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(User user)
+        public async Task<IActionResult> Register([FromBody] User user) // ✅ DODANE [FromBody]
         {
             if (await _context.Users.AnyAsync(u => u.Username == user.Username))
                 return BadRequest("Username already exists.");
@@ -36,7 +36,7 @@ namespace WarehouseApp.API.Controllers
             if (user == null)
                 return Unauthorized();
 
-            return Ok(user); // w prawdziwym systemie zwrócisz JWT/token
+            return Ok(user);
         }
     }
 }
