@@ -1,100 +1,117 @@
-﻿using System.Windows.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using WarehouseApp.MAUI.Services;
-using System.ComponentModel;
+using Microsoft.Maui.ApplicationModel;
 using System.Net.Http.Headers;
+using WarehouseApp.Core;
+using WarehouseApp.MAUI.Services;
 
-namespace WarehouseApp.MAUI.ViewModels
+namespace WarehouseApp.MAUI.ViewModels;
+
+public partial class AddItemViewModel : ObservableObject
 {
-    public class AddItemViewModel : INotifyPropertyChanged
+    [ObservableProperty] private string name = string.Empty;
+    [ObservableProperty] private string description = string.Empty;
+    [ObservableProperty] private string quantity = string.Empty;
+    [ObservableProperty] private ImageSource? image;
+
+    private string? _imagePath;
+
+    public IAsyncRelayCommand TakePhotoCommand { get; }
+    public IAsyncRelayCommand SaveCommand { get; }
+
+    private readonly ItemService _items;
+    private readonly INotificationService _toast;
+
+    public AddItemViewModel(ItemService items, INotificationService toast)
     {
-        public string Name { get; set; } = "";
-        public string Description { get; set; } = "";
-        public string Quantity { get; set; } = "";
-        public ImageSource? Image { get; set; }
+        _items = items;
+        _toast = toast;
 
-        private string? _imagePath;
+        TakePhotoCommand = new AsyncRelayCommand(TakePhotoAsync);
+        SaveCommand = new AsyncRelayCommand(SaveAsync);
+    }
 
-        public ICommand TakePhotoCommand { get; }
-        public ICommand SaveCommand { get; }
+    public AddItemViewModel()
+        : this(new ItemService(new HttpClient { BaseAddress = new Uri("https://localhost:7073/api/") }),
+               new NotificationService())
+    { }
 
-        private readonly ItemService _service = new(new HttpClient
+    private async Task TakePhotoAsync()
+    {
+        FileResult? result = null;
+
+#if ANDROID || IOS
+        result = await MediaPicker.CapturePhotoAsync();
+#elif WINDOWS
+        result = await FilePicker.Default.PickAsync(new PickOptions
         {
-            BaseAddress = new Uri("https://localhost:7073") // <- zamień na prawdziwy adres API
+            PickerTitle = "Wybierz zdjęcie",
+            FileTypes = FilePickerFileType.Images
         });
-
-        public AddItemViewModel()
+#endif
+        if (result is not null)
         {
-            TakePhotoCommand = new AsyncRelayCommand(TakePhotoAsync);
-            SaveCommand = new AsyncRelayCommand(SaveAsync);
+            _imagePath = result.FullPath;
+            Image = ImageSource.FromFile(_imagePath);
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (string.IsNullOrWhiteSpace(Name) ||
+            string.IsNullOrWhiteSpace(Description) ||
+            string.IsNullOrWhiteSpace(Quantity))
+        {
+            await _toast.ErrorAsync("Uzupełnij wszystkie pola");
+            return;
         }
 
-        private async Task TakePhotoAsync()
+        if (!int.TryParse(Quantity, out _))
         {
-            var result = await MediaPicker.CapturePhotoAsync();
-            if (result != null)
-            {
-                _imagePath = result.FullPath;
-                Image = ImageSource.FromFile(_imagePath);
-                OnPropertyChanged(nameof(Image));
-            }
+            await _toast.ErrorAsync("Ilość musi być liczbą");
+            return;
         }
 
-        private async Task SaveAsync()
+        using var content = new MultipartFormDataContent
         {
-            if (string.IsNullOrWhiteSpace(Name) ||
-                string.IsNullOrWhiteSpace(Description) ||
-                string.IsNullOrWhiteSpace(Quantity))
-            {
-                await Shell.Current.DisplayAlert("Błąd", "Uzupełnij wszystkie pola", "OK");
-                return;
-            }
+            { new StringContent(Name),        "Name" },
+            { new StringContent(Description), "Description" },
+            { new StringContent(Quantity),    "Quantity" }
+        };
 
-            if (!int.TryParse(Quantity, out int qty))
-            {
-                await Shell.Current.DisplayAlert("Błąd", "Niepoprawna liczba w polu ilość", "OK");
-                return;
-            }
-
-            using var content = new MultipartFormDataContent();
-
-            content.Add(new StringContent(Name), "Name");
-            content.Add(new StringContent(Description), "Description");
-            content.Add(new StringContent(Quantity), "Quantity");
-
-            if (!string.IsNullOrWhiteSpace(_imagePath) && File.Exists(_imagePath))
-            {
-                var imageContent = new StreamContent(File.OpenRead(_imagePath));
-                imageContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
-                content.Add(imageContent, "Image", Path.GetFileName(_imagePath));
-            }
-
-            var success = await _service.AddItemAsync(content);
-
-            if (success)
-            {
-                Name = "";
-                Description = "";
-                Quantity = "";
-                Image = null;
-                _imagePath = null;
-
-                OnPropertyChanged(nameof(Name));
-                OnPropertyChanged(nameof(Description));
-                OnPropertyChanged(nameof(Quantity));
-                OnPropertyChanged(nameof(Image));
-
-                await Shell.Current.GoToAsync("//InventoryPage");
-            }
-            else
-            {
-                await Shell.Current.DisplayAlert("Błąd", "Nie udało się zapisać produktu", "OK");
-            }
+        if (!string.IsNullOrWhiteSpace(_imagePath) && File.Exists(_imagePath))
+        {
+            var img = new StreamContent(File.OpenRead(_imagePath));
+            img.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+            content.Add(img, "Image", Path.GetFileName(_imagePath));
         }
 
+        try
+        {
+            var ok = await _items.AddAsync(content).ConfigureAwait(false);
+            if (!ok) throw new Exception("Serwer zwrócił błąd");
 
-        public event PropertyChangedEventHandler? PropertyChanged;
-        void OnPropertyChanged(string prop) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
+            await _toast.SuccessAsync("Dodano produkt");
+
+            ResetFields();
+
+            // ABSOLUTNA trasa + parametr, aby InventoryPage wywołał LoadAsync()
+            await MainThread.InvokeOnMainThreadAsync(() =>
+                Shell.Current.GoToAsync("//InventoryPage"));
+        }
+        catch (Exception ex)
+        {
+            await _toast.ErrorAsync($"Błąd: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine(ex);
+        }
+    }
+
+    private void ResetFields()
+    {
+        Name = string.Empty;
+        Description = string.Empty;
+        Quantity = string.Empty;
+        Image = null;
+        _imagePath = null;
     }
 }

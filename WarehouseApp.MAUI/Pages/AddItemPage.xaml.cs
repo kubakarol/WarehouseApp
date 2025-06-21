@@ -1,10 +1,12 @@
-﻿namespace WarehouseApp.MAUI.Pages;
+﻿using WarehouseApp.MAUI.ViewModels;
+
+namespace WarehouseApp.MAUI.Pages;
 
 public partial class AddItemPage : ContentPage
 {
-    public AddItemPage()
+    public AddItemPage(AddItemViewModel vm)
     {
         InitializeComponent();
-        BindingContext = new ViewModels.AddItemViewModel();
+        BindingContext = vm;
     }
 }

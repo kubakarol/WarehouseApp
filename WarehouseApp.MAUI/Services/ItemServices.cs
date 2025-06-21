@@ -5,53 +5,32 @@ namespace WarehouseApp.MAUI.Services
 {
     public class ItemService
     {
-        private readonly HttpClient _httpClient;
-        private const string BaseUrl = "https://localhost:7073/api/item";
+        private readonly HttpClient _http;
+        private const string Base = "https://localhost:7073/api/item";
 
-        public ItemService(HttpClient httpClient)
-        {
-            _httpClient = httpClient;
-        }
+        public ItemService(HttpClient http) => _http = http;
 
-        public async Task<List<Item>> GetItemsAsync()
-        {
-            try
-            {
-                var items = await _httpClient.GetFromJsonAsync<List<Item>>(BaseUrl);
-                return items ?? new List<Item>();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Błąd pobierania danych: {ex.Message}");
-                return new List<Item>();
-            }
-        }
+        // Główne metody
+        public async Task<List<Item>> GetAllAsync() =>
+            await _http.GetFromJsonAsync<List<Item>>(Base) ?? new();
 
-        public async Task<bool> AddItemAsync(MultipartFormDataContent content)
-        {
-            try
-            {
-                var response = await _httpClient.PostAsync(BaseUrl, content);
-                return response.IsSuccessStatusCode;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Błąd wysyłania: {ex.Message}");
-                return false;
-            }
-        }
+        public async Task<bool> AddAsync(MultipartFormDataContent body) =>
+            (await _http.PostAsync(Base, body)).IsSuccessStatusCode;
 
+        public async Task UpdateAsync(Item item) =>
+            (await _http.PutAsJsonAsync($"{Base}/{item.Id}", item)).EnsureSuccessStatusCode();
 
-        public async Task UpdateItemAsync(Item item)
-        {
-            var response = await _httpClient.PutAsJsonAsync($"api/Item/{item.Id}", item);
-            response.EnsureSuccessStatusCode();
-        }
+        public async Task<bool> DeleteAsync(int id) =>
+            (await _http.DeleteAsync($"{Base}/{id}")).IsSuccessStatusCode;
 
-        public async Task<bool> DeleteItemAsync(int id)
-        {
-            var response = await _httpClient.DeleteAsync($"{BaseUrl}/{id}");
-            return response.IsSuccessStatusCode;
-        }
+        public async Task<bool> AddStockAsync(int id, int qty) =>
+            (await _http.PutAsync($"{Base}/{id}/add/{qty}", null)).IsSuccessStatusCode;
+
+        public async Task<bool> RemoveStockAsync(int id, int qty) =>
+            (await _http.PutAsync($"{Base}/{id}/remove/{qty}", null)).IsSuccessStatusCode;
+
+        // 🔁 ALIASY do starego kodu
+        public Task<bool> AddItemAsync(MultipartFormDataContent body) => AddAsync(body);
+        public Task UpdateItemAsync(Item item) => UpdateAsync(item);
     }
 }

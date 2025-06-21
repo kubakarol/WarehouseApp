@@ -1,56 +1,83 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using System.Collections.ObjectModel;
 using WarehouseApp.Core;
 using WarehouseApp.MAUI.Services;
 
-namespace WarehouseApp.MAUI.ViewModels
+namespace WarehouseApp.MAUI.ViewModels;
+
+public partial class InventoryViewModel : ObservableObject
 {
-    public class InventoryViewModel : INotifyPropertyChanged
+    private readonly ItemService _itemService;
+    private readonly INotificationService _toast;
+
+    // ⚠️ NAZWA pola musi być _items albo items
+    [ObservableProperty] private ObservableCollection<Item> _items = new();
+
+    // ------------------------------------------------------------
+    //  Konstruktory
+    // ------------------------------------------------------------
+    public InventoryViewModel(ItemService itemService, INotificationService toast)
     {
-        public ObservableCollection<Item> Items { get; set; } = new();
-        private readonly ItemService _itemService;
+        _itemService = itemService;
+        _toast = toast;
+    }
 
-        public InventoryViewModel()
+    // awaryjny – gdy ktoś w kodzie robi new InventoryViewModel()
+    public InventoryViewModel()
+        : this(new ItemService(new HttpClient { BaseAddress = new Uri("https://localhost:7073/api/") }),
+               new NotificationService())
+    { }
+
+    // ------------------------------------------------------------
+    //  Komendy
+    // ------------------------------------------------------------
+    [RelayCommand]
+    public async Task LoadAsync() =>
+        Items = new ObservableCollection<Item>(await _itemService.GetAllAsync());
+
+    [RelayCommand] public Task IncreaseAsync(Item item) => ChangeStockAsync(item, +1);
+    [RelayCommand] public Task DecreaseAsync(Item item) => ChangeStockAsync(item, -1);
+
+    [RelayCommand]
+    public async Task DeleteAsync(Item item)
+    {
+        if (await _itemService.DeleteAsync(item.Id))
         {
-            _itemService = new ItemService(new HttpClient
-            {
-                BaseAddress = new Uri("https://localhost:7073")
-            });
-            LoadItemsAsync();
+            Items.Remove(item);
+            await _toast.SuccessAsync("Usunięto produkt");
         }
+        else
+            await _toast.ErrorAsync("Nie udało się usunąć");
+    }
 
-        public async Task LoadItemsAsync()
+    // ------------------------------------------------------------
+    //  Prywatna logika
+    // ------------------------------------------------------------
+    private async Task ChangeStockAsync(Item item, int delta)
+    {
+        bool ok = delta > 0
+            ? await _itemService.AddStockAsync(item.Id, delta)
+            : await _itemService.RemoveStockAsync(item.Id, -delta);
+
+        if (ok)
         {
-            var items = await _itemService.GetItemsAsync();
-            Items.Clear();
-            foreach (var item in items)
-                Items.Add(item);
+            item.Quantity += delta;
+            Items[Items.IndexOf(item)] = item;
+            await _toast.SuccessAsync($"Stan „{item.Name}”: {item.Quantity}");
         }
+        else
+            await _toast.ErrorAsync("Błąd aktualizacji stanu");
+    }
 
-        public void RefreshItem(Item item)
-        {
-            var index = Items.IndexOf(item);
-            if (index >= 0)
-            {
-                Items.RemoveAt(index);
-                Items.Insert(index, item);
-            }
-        }
+    // ------------------------------------------------------------
+    //  ALIASY dla starego kodu
+    // ------------------------------------------------------------
+    public Task LoadItemsAsync() => LoadAsync();
 
-        public event PropertyChangedEventHandler? PropertyChanged;
-        void OnPropertyChanged([CallerMemberName] string name = "") =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-
-        public void DecreaseItemQuantity(int itemId, int count)
-        {
-            var item = Items.FirstOrDefault(i => i.Id == itemId);
-            if (item != null)
-            {
-                item.Quantity -= count;
-                RefreshItem(item);
-            }
-        }
-
+    public void RefreshItem(Item item)
+    {
+        var ix = Items.IndexOf(item);
+        if (ix >= 0) Items[ix] = item;
     }
 }

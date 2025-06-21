@@ -1,31 +1,44 @@
-﻿using Microsoft.Extensions.Logging;
-using WarehouseApp.MAUI.ViewModels;
+﻿using CommunityToolkit.Maui;
+using Microsoft.Extensions.Logging;
 using WarehouseApp.MAUI.Pages;
+using WarehouseApp.MAUI.Services;
+using WarehouseApp.MAUI.ViewModels;
 
-namespace WarehouseApp.MAUI
+namespace WarehouseApp.MAUI;
+
+public static class MauiProgram
 {
-    public static class MauiProgram
+    public static MauiApp CreateMauiApp()
     {
-        public static MauiApp CreateMauiApp()
-        {
-            var builder = MauiApp.CreateBuilder();
-            builder
-                .UseMauiApp<App>()
-                .ConfigureFonts(fonts =>
-                {
-                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                    fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                });
+        var builder = MauiApp.CreateBuilder();
+
+        builder
+            .UseMauiApp<App>()
+            .UseMauiCommunityToolkit()      // <-- WAŻNE
+            .ConfigureFonts(f =>
+            {
+                f.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                f.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+            });
 
 #if DEBUG
-            builder.Logging.AddDebug();
+        builder.Logging.AddDebug();
 #endif
 
-            // Rejestracja tylko ViewModel i strony magazynowej
-            builder.Services.AddSingleton<InventoryViewModel>();
-            builder.Services.AddSingleton<InventoryPage>();
+        /* ---------- HttpClient ---------- */
+        builder.Services.AddSingleton(_ => new HttpClient
+        {
+            BaseAddress = new Uri("https://localhost:7073/api/")
+        });
 
-            return builder.Build();
-        }
+        /* ---------- DI ---------- */
+        builder.Services.AddSingleton<ItemService>();
+        builder.Services.AddSingleton<INotificationService, NotificationService>();
+        builder.Services.AddTransient<AddItemViewModel>();
+        builder.Services.AddTransient<Pages.AddItemPage>();
+        builder.Services.AddTransient<InventoryViewModel>();
+        builder.Services.AddTransient<Inventory>();
+
+        return builder.Build();
     }
 }

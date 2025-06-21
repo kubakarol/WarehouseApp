@@ -1,4 +1,5 @@
-﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:WarehouseApp.MAUI.ViewModels"
              x:Class="WarehouseApp.MAUI.Pages.AddItemPage"
@@ -7,16 +8,17 @@
 
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="10">
-
-            <Entry Placeholder="Nazwa" Text="{Binding Name}" />
-            <Editor Placeholder="Opis" AutoSize="TextChanges" Text="{Binding Description}" />
-            <Entry Placeholder="Ilość" Keyboard="Numeric" Text="{Binding Quantity}" />
+            <Entry  Placeholder="Nazwa"       Text="{Binding Name}" />
+            <Editor Placeholder="Opis"
+                    AutoSize="TextChanges"
+                    Text="{Binding Description}" />
+            <Entry  Placeholder="Ilość"
+                    Keyboard="Numeric"
+                    Text="{Binding Quantity}" />
 
             <Image Source="{Binding Image}" HeightRequest="150" />
-            <Button Text="Zrób/Zmień zdjęcie" Command="{Binding TakePhotoCommand}" />
-
-            <Button Text="Zapisz" Command="{Binding SaveCommand}" />
-
+            <Button Text="Zdjęcie" Command="{Binding TakePhotoCommand}" />
+            <Button Text="Zapisz"  Command="{Binding SaveCommand}" />
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

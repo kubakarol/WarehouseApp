@@ -10,11 +10,13 @@
 
     <ShellContent Route="LoginPage" ContentTemplate="{DataTemplate pages:LoginPage}" />
     <ShellContent Route="RegisterPage" ContentTemplate="{DataTemplate pages:RegisterPage}" />
-    <ShellContent Route="InventoryPage" ContentTemplate="{DataTemplate pages:InventoryPage}" />
     <ShellContent Route="ShopPage" ContentTemplate="{DataTemplate pages:ShopPage}" />
-    <ShellContent Route="AddItemPage" ContentTemplate="{DataTemplate pages:AddItemPage}" />
     <ShellContent Route="CartPage" ContentTemplate="{DataTemplate pages:CartPage}" />
-    <ShellContent Route="AddItemPage" ContentTemplate="{DataTemplate pages:AddItemPage}" />
+    <ShellContent
+    Route="InventoryPage"  
+        ContentTemplate="{DataTemplate pages:Inventory}" />
+    <ShellContent Route="AddItemPage"
+              ContentTemplate="{DataTemplate pages:AddItemPage}" />
 
 
 
