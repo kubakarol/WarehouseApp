@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Json;
 using WarehouseApp.Core;
+using System.Text.Json;
 
 namespace WarehouseApp.MAUI.Services
 {
@@ -18,6 +19,7 @@ namespace WarehouseApp.MAUI.Services
             try
             {
                 Console.WriteLine($"[🔁] Sending login request to {BaseUrl}/auth/login");
+                Console.WriteLine($"[📦] Payload: {JsonSerializer.Serialize(new { username, password })}");
 
                 var response = await _httpClient.PostAsJsonAsync($"{BaseUrl}/auth/login", new User
                 {
@@ -27,18 +29,17 @@ namespace WarehouseApp.MAUI.Services
 
                 Console.WriteLine($"[ℹ️] Response status: {response.StatusCode}");
 
+                var responseBody = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"[📨] Response content: {responseBody}");
+
                 if (response.IsSuccessStatusCode)
                 {
-                    var user = await response.Content.ReadFromJsonAsync<User>();
+                    var user = JsonSerializer.Deserialize<User>(responseBody);
                     Console.WriteLine($"[✅] Login success for user: {user?.Username}");
                     return user;
                 }
-                else
-                {
-                    var error = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"[❌] Login failed: {error}");
-                    return null;
-                }
+
+                return null;
             }
             catch (Exception ex)
             {
@@ -52,22 +53,15 @@ namespace WarehouseApp.MAUI.Services
             try
             {
                 Console.WriteLine($"[🔁] Sending register request to {BaseUrl}/auth/register");
+                Console.WriteLine($"[📦] Payload: {JsonSerializer.Serialize(user)}");
 
                 var response = await _httpClient.PostAsJsonAsync($"{BaseUrl}/auth/register", user);
 
                 Console.WriteLine($"[ℹ️] Response status: {response.StatusCode}");
+                var responseBody = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"[📨] Response content: {responseBody}");
 
-                if (response.IsSuccessStatusCode)
-                {
-                    Console.WriteLine("[✅] Registration successful.");
-                    return true;
-                }
-                else
-                {
-                    var error = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"[❌] Registration failed: {error}");
-                    return false;
-                }
+                return response.IsSuccessStatusCode;
             }
             catch (Exception ex)
             {
