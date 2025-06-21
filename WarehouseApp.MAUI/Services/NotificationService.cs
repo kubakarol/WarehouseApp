@@ -29,7 +29,6 @@ namespace WarehouseApp.MAUI.Services
             TryVibrate(300);
         }
 
-        /* ============================ */
         private static void TryVibrate(int ms)
         {
 #if ANDROID || IOS          // na Windows / Mac wyłączamy
