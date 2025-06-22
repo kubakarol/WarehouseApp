@@ -3,37 +3,26 @@ using WarehouseApp.MAUI.ViewModels;
 
 namespace WarehouseApp.MAUI.Pages;
 
-/// <summary>
-/// Strona magazynowa – odświeża dane za każdym pojawieniem się.
-/// </summary>
 public partial class Inventory : ContentPage
 {
     public Inventory(InventoryViewModel vm)
     {
-        InitializeComponent();     // ← teraz kompilator wygeneruje tę metodę
+        InitializeComponent();
         BindingContext = vm;
-
-        // pierwsze pobranie listy
-        _ = vm.LoadAsync();
+        _ = vm.LoadAsync();          // pierwsze ładowanie
     }
 
-    /// <summary>Wywoływane zawsze, gdy użytkownik wraca do tej strony.</summary>
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-
         if (BindingContext is InventoryViewModel vm)
-            await vm.LoadAsync();  // pobranie najnowszych danych z API
+            await vm.LoadAsync();    // zawsze świeże dane
     }
 
     private async void OnLogoutClicked(object sender, EventArgs e)
-    {
-        Preferences.Set("Role", string.Empty);
-        await Shell.Current.GoToAsync("//LoginPage");
-    }
+        => await Shell.Current.GoToAsync("//LoginPage");
 
     private async void OnAddItemClicked(object sender, EventArgs e)
-    {
-        await Shell.Current.GoToAsync("//AddItemPage");
-    }
+        // ⚠️ NAZWA trasy = nameof(AddItemPage)  (bez //)
+        => await Shell.Current.GoToAsync(nameof(AddItemPage));
 }

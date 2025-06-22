@@ -1,75 +1,97 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:vm="clr-namespace:WarehouseApp.MAUI.ViewModels"
-             xmlns:core="clr-namespace:WarehouseApp.Core;assembly=WarehouseApp.Core"
-             x:Class="WarehouseApp.MAUI.Pages.Inventory"
-             x:DataType="vm:InventoryViewModel"
-             Title="Magazyn">
+<ContentPage
+    x:Class="WarehouseApp.MAUI.Pages.Inventory"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:core="clr-namespace:WarehouseApp.Core;assembly=WarehouseApp.Core"
+    xmlns:vm="clr-namespace:WarehouseApp.MAUI.ViewModels"
+    x:DataType="vm:InventoryViewModel"
+    Title="Magazyn">
 
+    <!-- ░░░  TOOLBAR  ░░░ -->
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Odśwież" Command="{Binding LoadCommand}" />
+        <ToolbarItem Text="Odśwież"
+                     Command="{Binding LoadCommand}" />
     </ContentPage.ToolbarItems>
 
-    <ScrollView>
-        <VerticalStackLayout Padding="10" Spacing="10">
+    <!-- ░░░  CONTENT  ░░░ -->
+    <ContentPage.Content>
+        <ScrollView>
+            <VerticalStackLayout Padding="10" Spacing="10">
 
-            <!-- Pasek przycisków -->
-            <HorizontalStackLayout Spacing="10">
-                <Button Text="➕ Dodaj produkt"
-                        Clicked="OnAddItemClicked"
-                        BackgroundColor="LightGreen"
-                        CornerRadius="10"
-                        HorizontalOptions="FillAndExpand" />
+                <!-- Pasek z przyciskami -->
+                <HorizontalStackLayout Spacing="10">
+                    <Button Text="➕ Dodaj produkt"
+                            Clicked="OnAddItemClicked"
+                            BackgroundColor="LightGreen"
+                            CornerRadius="10"
+                            HorizontalOptions="FillAndExpand" />
 
-                <Button Text="🚪 Wyloguj"
-                        Clicked="OnLogoutClicked"
-                        BackgroundColor="LightPink"
-                        CornerRadius="10"
-                        HorizontalOptions="FillAndExpand" />
-            </HorizontalStackLayout>
+                    <Button Text="🚪 Wyloguj"
+                            Clicked="OnLogoutClicked"
+                            BackgroundColor="LightPink"
+                            CornerRadius="10"
+                            HorizontalOptions="FillAndExpand" />
+                </HorizontalStackLayout>
 
-            <!-- Lista produktów -->
-            <CollectionView ItemsSource="{Binding Items}"
-                            VerticalOptions="FillAndExpand">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="core:Item">
-                        <Frame BorderColor="LightGray" CornerRadius="12" Margin="5" Padding="10">
-                            <VerticalStackLayout Spacing="5">
+                <!-- 🔍 SearchBar -->
+                <SearchBar Placeholder="Szukaj…"
+                           Text="{Binding SearchText}"
+                           CancelButtonColor="Gray" />
 
-                                <Image Source="{Binding ImageUrl}"
-                                       HeightRequest="150"
-                                       Aspect="AspectFill" />
+                <!-- Lista produktów -->
+                <CollectionView ItemsSource="{Binding FilteredItems}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="core:Item">
+                            <Frame BorderColor="LightGray"
+                                   CornerRadius="12"
+                                   Margin="5"
+                                   Padding="10">
+                                <VerticalStackLayout Spacing="5">
 
-                                <Label Text="{Binding Name}"
-                                       FontAttributes="Bold"
-                                       FontSize="16" />
+                                    <Image Source="{Binding ImageUrl}"
+                                           HeightRequest="150"
+                                           Aspect="AspectFill" />
 
-                                <Label Text="{Binding Description}"
-                                       FontSize="12"
-                                       TextColor="Gray" />
+                                    <Label Text="{Binding Name}"
+                                           FontAttributes="Bold"
+                                           FontSize="16" />
+                                    <Label Text="{Binding Description}"
+                                           FontSize="12"
+                                           TextColor="Gray" />
+                                    <Label Text="{Binding Quantity,
+                                                         StringFormat='Ilość: {0}'}"
+                                           FontSize="12" />
 
-                                <Label Text="{Binding Quantity, StringFormat='Ilość: {0}'}"
-                                       FontSize="12" />
+                                    <!-- Przyciski +/-/🗑 -->
+                                    <HorizontalStackLayout Spacing="6">
+                                        <Button Text="+"
+                                                WidthRequest="45"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:InventoryViewModel}},
+                                                                  Path=IncreaseCommand}"
+                                                CommandParameter="{Binding .}" />
 
-                                <HorizontalStackLayout Spacing="6" Margin="0,5,0,0">
-                                    <Button Text="+" WidthRequest="40"
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:InventoryViewModel}}, Path=IncreaseCommand}"
-                                            CommandParameter="{Binding .}" />
-                                    <Button Text="-" WidthRequest="40"
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:InventoryViewModel}}, Path=DecreaseCommand}"
-                                            CommandParameter="{Binding .}" />
-                                    <Button Text="🗑" WidthRequest="40"
-                                            BackgroundColor="LightPink"
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:InventoryViewModel}}, Path=DeleteCommand}"
-                                            CommandParameter="{Binding .}" />
-                                </HorizontalStackLayout>
-                            </VerticalStackLayout>
-                        </Frame>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+                                        <Button Text="-"
+                                                WidthRequest="45"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:InventoryViewModel}},
+                                                                  Path=DecreaseCommand}"
+                                                CommandParameter="{Binding .}" />
 
-        </VerticalStackLayout>
-    </ScrollView>
+                                        <Button Text="🗑"
+                                                WidthRequest="45"
+                                                BackgroundColor="LightPink"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:InventoryViewModel}},
+                                                                  Path=DeleteCommand}"
+                                                CommandParameter="{Binding .}" />
+                                    </HorizontalStackLayout>
+
+                                </VerticalStackLayout>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </ContentPage.Content>
 </ContentPage>

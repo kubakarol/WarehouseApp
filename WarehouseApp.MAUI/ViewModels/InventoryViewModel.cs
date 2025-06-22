@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using WarehouseApp.Core;
 using WarehouseApp.MAUI.Services;
 
@@ -11,7 +13,15 @@ public partial class InventoryViewModel : ObservableObject
     private readonly ItemService _itemService;
     private readonly INotificationService _toast;
 
+    // Pełna lista z API
     [ObservableProperty] private ObservableCollection<Item> _items = new();
+
+    // Lista filtrowana – na niej pracuje CollectionView
+    [ObservableProperty] private ObservableCollection<Item> _filteredItems = new();
+
+    // Tekst z SearchBar
+    [ObservableProperty] private string searchText = string.Empty;
+    partial void OnSearchTextChanged(string value) => FilterItems();
 
     public InventoryViewModel(ItemService itemService, INotificationService toast)
     {
@@ -19,61 +29,72 @@ public partial class InventoryViewModel : ObservableObject
         _toast = toast;
     }
 
+    // Konstruktor awaryjny
     public InventoryViewModel()
-        : this(new ItemService(new HttpClient { BaseAddress = new Uri("https://testwarehouse.azurewebsites.net/api/") }),
-               new NotificationService())
+        : this(
+            new ItemService(new HttpClient { BaseAddress = new Uri("https://testwarehouse.azurewebsites.net/api/") }),
+            new NotificationService())
     { }
 
+    /* ---------- Ładowanie ---------- */
     [RelayCommand]
     public async Task LoadAsync()
     {
-        var items = await _itemService.GetAllAsync();
-        Items = new ObservableCollection<Item>(items);
+        Items = new ObservableCollection<Item>(await _itemService.GetAllAsync());
+        FilterItems();
     }
 
-    [RelayCommand]
-    public async Task IncreaseAsync(Item item)
+    /* ---------- Zmiana stanu ---------- */
+    [RelayCommand] public Task IncreaseAsync(Item item) => ChangeStockAsync(item, +1);
+    [RelayCommand] public Task DecreaseAsync(Item item) => ChangeStockAsync(item, -1);
+
+    private async Task ChangeStockAsync(Item item, int delta)
     {
-        bool ok = await _itemService.AddStockAsync(item.Id, 1);
+        bool ok = delta > 0
+            ? await _itemService.AddStockAsync(item.Id, delta)
+            : await _itemService.RemoveStockAsync(item.Id, -delta);
+
         if (ok)
         {
-            await LoadAsync(); // ZAWSZE pobieraj najnowsze dane!
-            await _toast.SuccessAsync($"Stan „{item.Name}” został zwiększony.");
+            item.Quantity += delta;   // aktualizacja lokalna
+            FilterItems();            // odśwież widok
+            await _toast.SuccessAsync($"Stan „{item.Name}”: {item.Quantity}");
         }
         else
             await _toast.ErrorAsync("Błąd aktualizacji stanu");
     }
 
-    [RelayCommand]
-    public async Task DecreaseAsync(Item item)
-    {
-        bool ok = await _itemService.RemoveStockAsync(item.Id, 1);
-        if (ok)
-        {
-            await LoadAsync();
-            await _toast.SuccessAsync($"Stan „{item.Name}” został zmniejszony.");
-        }
-        else
-            await _toast.ErrorAsync("Błąd aktualizacji stanu");
-    }
-
+    /* ---------- Usuwanie ---------- */
     [RelayCommand]
     public async Task DeleteAsync(Item item)
     {
         if (await _itemService.DeleteAsync(item.Id))
         {
-            await LoadAsync();
+            Items.Remove(item);
+            FilterItems();
             await _toast.SuccessAsync("Usunięto produkt");
         }
         else
             await _toast.ErrorAsync("Nie udało się usunąć");
     }
 
-    // ALIASY
-    public Task LoadItemsAsync() => LoadAsync();
-
-    public void RefreshItem(Item item)
+    /* ---------- Filtrowanie ---------- */
+    private void FilterItems()
     {
-        // już niepotrzebne w tym podejściu
+        if (string.IsNullOrWhiteSpace(SearchText))
+        {
+            FilteredItems = new ObservableCollection<Item>(Items);
+            return;
+        }
+
+        var lower = SearchText.ToLowerInvariant();
+        var filtered = Items.Where(i =>
+            (i.Name?.ToLowerInvariant().Contains(lower) ?? false) ||
+            (i.Description?.ToLowerInvariant().Contains(lower) ?? false));
+
+        FilteredItems = new ObservableCollection<Item>(filtered);
     }
+
+    /* ---------- Alias dla starego kodu ---------- */
+    public Task LoadItemsAsync() => LoadAsync();
 }
