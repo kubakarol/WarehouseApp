@@ -6,11 +6,11 @@ namespace WarehouseApp.MAUI.Services
     public class ItemService
     {
         private readonly HttpClient _http;
+        // Tylko Azure!
         private const string Base = "https://testwarehouse.azurewebsites.net/api/Item";
 
         public ItemService(HttpClient http) => _http = http;
 
-        // Główne metody
         public async Task<List<Item>> GetAllAsync() =>
             await _http.GetFromJsonAsync<List<Item>>(Base) ?? new();
 

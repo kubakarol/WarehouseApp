@@ -11,27 +11,19 @@ public partial class InventoryViewModel : ObservableObject
     private readonly ItemService _itemService;
     private readonly INotificationService _toast;
 
-    // ⚠️ NAZWA pola musi być _items albo items
     [ObservableProperty] private ObservableCollection<Item> _items = new();
 
-    // ------------------------------------------------------------
-    //  Konstruktory
-    // ------------------------------------------------------------
     public InventoryViewModel(ItemService itemService, INotificationService toast)
     {
         _itemService = itemService;
         _toast = toast;
     }
 
-    // awaryjny – gdy ktoś w kodzie robi new InventoryViewModel()
+    // !!! BEZ BaseAddress !!!
     public InventoryViewModel()
-        : this(new ItemService(new HttpClient { BaseAddress = new Uri("https://localhost:7073/api/") }),
-               new NotificationService())
+        : this(new ItemService(new HttpClient()), new NotificationService())
     { }
 
-    // ------------------------------------------------------------
-    //  Komendy
-    // ------------------------------------------------------------
     [RelayCommand]
     public async Task LoadAsync() =>
         Items = new ObservableCollection<Item>(await _itemService.GetAllAsync());
@@ -51,9 +43,6 @@ public partial class InventoryViewModel : ObservableObject
             await _toast.ErrorAsync("Nie udało się usunąć");
     }
 
-    // ------------------------------------------------------------
-    //  Prywatna logika
-    // ------------------------------------------------------------
     private async Task ChangeStockAsync(Item item, int delta)
     {
         bool ok = delta > 0
@@ -70,11 +59,7 @@ public partial class InventoryViewModel : ObservableObject
             await _toast.ErrorAsync("Błąd aktualizacji stanu");
     }
 
-    // ------------------------------------------------------------
-    //  ALIASY dla starego kodu
-    // ------------------------------------------------------------
     public Task LoadItemsAsync() => LoadAsync();
-
     public void RefreshItem(Item item)
     {
         var ix = Items.IndexOf(item);

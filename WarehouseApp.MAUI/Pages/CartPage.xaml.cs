@@ -12,7 +12,7 @@ public partial class CartPage : ContentPage
     private readonly ObservableCollection<CartItemViewModel> _cart;
     private readonly ItemService _service = new(new HttpClient
     {
-        BaseAddress = new Uri("https://localhost:7073")
+        BaseAddress = new Uri("https://warehouseapp-ebspazdhhbhgtb0e.westeurope-01.azurewebsites.net/api/Item")
     });
 
     public CartPage()

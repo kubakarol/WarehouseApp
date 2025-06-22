@@ -33,9 +33,9 @@ public partial class AddItemViewModel : ObservableObject
         SaveCommand = new AsyncRelayCommand(SaveAsync);
     }
 
+    // !!! BEZ BaseAddress !!!
     public AddItemViewModel()
-   : this(new ItemService(new HttpClient { BaseAddress = new Uri("http://10.0.2.2:7073/api/") }),
-               new NotificationService())
+        : this(new ItemService(new HttpClient()), new NotificationService())
     { }
 
     private async Task TakePhotoAsync()
@@ -126,7 +126,6 @@ public partial class AddItemViewModel : ObservableObject
 
             await _toast.SuccessAsync("Dodano produkt");
             try { Vibration.Default.Vibrate(100); } catch { }
-
 
             ResetFields();
 

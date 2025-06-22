@@ -101,4 +101,28 @@ public class ItemController : ControllerBase
         await _context.SaveChangesAsync();
         return NoContent();
     }
+
+    // ➕ Zwiększanie stanu
+    [HttpPut("{id}/add/{qty}")]
+    public async Task<IActionResult> AddStock(int id, int qty)
+    {
+        var item = await _context.Items.FindAsync(id);
+        if (item is null) return NotFound();
+
+        item.Quantity += qty;
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
+
+    // ➖ Zmniejszanie stanu
+    [HttpPut("{id}/remove/{qty}")]
+    public async Task<IActionResult> RemoveStock(int id, int qty)
+    {
+        var item = await _context.Items.FindAsync(id);
+        if (item is null) return NotFound();
+
+        item.Quantity = Math.Max(0, item.Quantity - qty);
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
 }
