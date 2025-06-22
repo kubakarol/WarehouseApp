@@ -6,7 +6,7 @@ namespace WarehouseApp.MAUI.Services
     public class ItemService
     {
         private readonly HttpClient _http;
-        private const string Base = "http://10.0.2.2:7073/api/item";
+        private const string Base = "https://testwarehouse.azurewebsites.net/api/Item";
 
         public ItemService(HttpClient http) => _http = http;
 

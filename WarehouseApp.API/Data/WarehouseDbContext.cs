@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WarehouseApp.Core;
+using WarehouseApp.API.Entities;
 
 namespace WarehouseApp.API.Data
 {
@@ -8,8 +9,8 @@ namespace WarehouseApp.API.Data
         public WarehouseDbContext(DbContextOptions<WarehouseDbContext> options)
             : base(options) { }
 
-        public DbSet<Item> Items { get; set; }
-        public DbSet<User> Users { get; set; }
+        public DbSet<ItemEntity> Items { get; set; }
+        public DbSet<UserEntity> Users { get; set; }
 
     }
 }

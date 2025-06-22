@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using System;
 using WarehouseApp.API.Data;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +14,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<WarehouseDbContext>(options =>
-    options.UseSqlite("Data Source=warehouse.db"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.WebHost.ConfigureKestrel(options =>
 {
@@ -39,17 +42,16 @@ var app = builder.Build();
 
 
 
-
+//app.MapGet("/", () => "Warehouse API is running");
 
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 //app.UseHttpsRedirection();
+//Test
 
 app.UseAuthorization();
 

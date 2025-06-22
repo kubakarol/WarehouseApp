@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WarehouseApp.API.Data;
+using WarehouseApp.API.Entities;
 using WarehouseApp.Core;
 
 namespace WarehouseApp.API.Controllers
@@ -17,26 +18,41 @@ namespace WarehouseApp.API.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] User user) // ✅ DODANE [FromBody]
+        public async Task<IActionResult> Register([FromBody] User user)
         {
             if (await _context.Users.AnyAsync(u => u.Username == user.Username))
                 return BadRequest("Username already exists.");
 
-            _context.Users.Add(user);
+            var entity = new UserEntity
+            {
+                Username = user.Username,
+                Password = user.Password,
+                Role = user.Role
+            };
+
+            _context.Users.Add(entity);
             await _context.SaveChangesAsync();
+
             return Ok(user);
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] User login)
         {
-            var user = await _context.Users
+            var userEntity = await _context.Users
                 .FirstOrDefaultAsync(u => u.Username == login.Username && u.Password == login.Password);
 
-            if (user == null)
+            if (userEntity == null)
                 return Unauthorized();
 
-            return Ok(user);
+            return Ok(new User
+            {
+                Id = userEntity.Id,
+                Username = userEntity.Username,
+                Password = userEntity.Password,
+                Role = userEntity.Role
+            });
         }
     }
+
 }

@@ -27,7 +27,7 @@ public static class MauiProgram
 
         builder.Services.AddSingleton(_ => new HttpClient
         {
-            BaseAddress = new Uri("http://10.0.2.2:7073/api/")
+            BaseAddress = new Uri("https://testwarehouse.azurewebsites.net")
         });
 
         /* ---------- DI ---------- */

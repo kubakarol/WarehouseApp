@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using WarehouseApp.API.Data;
 using WarehouseApp.API.Dtos;
+using WarehouseApp.API.Entities;
 using WarehouseApp.Core;
 
 namespace WarehouseApp.API.Controllers;
@@ -18,8 +19,21 @@ public class ItemController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll() =>
-        Ok(await _context.Items.ToListAsync());
+    public async Task<IActionResult> GetAll()
+    {
+        var items = await _context.Items.ToListAsync();
+
+        var result = items.Select(i => new Item
+        {
+            Id = i.Id,
+            Name = i.Name,
+            Description = i.Description,
+            Quantity = i.Quantity,
+            ImageUrl = i.ImageUrl
+        });
+
+        return Ok(result);
+    }
 
     [HttpPost]
     public async Task<IActionResult> Create([FromForm] ItemCreateDto dto)
@@ -37,7 +51,7 @@ public class ItemController : ControllerBase
             await dto.Image.CopyToAsync(stream);
         }
 
-        var item = new Item
+        var entity = new ItemEntity
         {
             Name = dto.Name,
             Description = dto.Description,
@@ -45,8 +59,17 @@ public class ItemController : ControllerBase
             ImageUrl = $"{Request.Scheme}://{Request.Host}/uploads/{fileName}"
         };
 
-        _context.Items.Add(item);
+        _context.Items.Add(entity);
         await _context.SaveChangesAsync();
+
+        var item = new Item
+        {
+            Id = entity.Id,
+            Name = entity.Name,
+            Description = entity.Description,
+            Quantity = entity.Quantity,
+            ImageUrl = entity.ImageUrl
+        };
 
         return CreatedAtAction(nameof(GetAll), new { id = item.Id }, item);
     }
@@ -55,7 +78,15 @@ public class ItemController : ControllerBase
     public async Task<IActionResult> Update(int id, Item item)
     {
         if (id != item.Id) return BadRequest();
-        _context.Entry(item).State = EntityState.Modified;
+
+        var entity = await _context.Items.FindAsync(id);
+        if (entity == null) return NotFound();
+
+        entity.Name = item.Name;
+        entity.Description = item.Description;
+        entity.Quantity = item.Quantity;
+        entity.ImageUrl = item.ImageUrl;
+
         await _context.SaveChangesAsync();
         return NoContent();
     }
@@ -63,10 +94,10 @@ public class ItemController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var item = await _context.Items.FindAsync(id);
-        if (item == null) return NotFound();
+        var entity = await _context.Items.FindAsync(id);
+        if (entity == null) return NotFound();
 
-        _context.Items.Remove(item);
+        _context.Items.Remove(entity);
         await _context.SaveChangesAsync();
         return NoContent();
     }

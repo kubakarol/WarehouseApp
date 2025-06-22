@@ -7,7 +7,7 @@ namespace WarehouseApp.MAUI.Services
     public class AuthService
     {
         private readonly HttpClient _httpClient;
-        private const string BaseUrl = "http://10.0.2.2:7073/api";
+        private const string BaseUrl = "https://testwarehouse.azurewebsites.net/api";
 
         public AuthService(HttpClient httpClient)
         {
