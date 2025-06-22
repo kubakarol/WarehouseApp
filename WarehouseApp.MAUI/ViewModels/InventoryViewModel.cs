@@ -19,50 +19,61 @@ public partial class InventoryViewModel : ObservableObject
         _toast = toast;
     }
 
-    // !!! BEZ BaseAddress !!!
     public InventoryViewModel()
-        : this(new ItemService(new HttpClient()), new NotificationService())
+        : this(new ItemService(new HttpClient { BaseAddress = new Uri("https://testwarehouse.azurewebsites.net/api/") }),
+               new NotificationService())
     { }
 
     [RelayCommand]
-    public async Task LoadAsync() =>
-        Items = new ObservableCollection<Item>(await _itemService.GetAllAsync());
+    public async Task LoadAsync()
+    {
+        var items = await _itemService.GetAllAsync();
+        Items = new ObservableCollection<Item>(items);
+    }
 
-    [RelayCommand] public Task IncreaseAsync(Item item) => ChangeStockAsync(item, +1);
-    [RelayCommand] public Task DecreaseAsync(Item item) => ChangeStockAsync(item, -1);
+    [RelayCommand]
+    public async Task IncreaseAsync(Item item)
+    {
+        bool ok = await _itemService.AddStockAsync(item.Id, 1);
+        if (ok)
+        {
+            await LoadAsync(); // ZAWSZE pobieraj najnowsze dane!
+            await _toast.SuccessAsync($"Stan „{item.Name}” został zwiększony.");
+        }
+        else
+            await _toast.ErrorAsync("Błąd aktualizacji stanu");
+    }
+
+    [RelayCommand]
+    public async Task DecreaseAsync(Item item)
+    {
+        bool ok = await _itemService.RemoveStockAsync(item.Id, 1);
+        if (ok)
+        {
+            await LoadAsync();
+            await _toast.SuccessAsync($"Stan „{item.Name}” został zmniejszony.");
+        }
+        else
+            await _toast.ErrorAsync("Błąd aktualizacji stanu");
+    }
 
     [RelayCommand]
     public async Task DeleteAsync(Item item)
     {
         if (await _itemService.DeleteAsync(item.Id))
         {
-            Items.Remove(item);
+            await LoadAsync();
             await _toast.SuccessAsync("Usunięto produkt");
         }
         else
             await _toast.ErrorAsync("Nie udało się usunąć");
     }
 
-    private async Task ChangeStockAsync(Item item, int delta)
-    {
-        bool ok = delta > 0
-            ? await _itemService.AddStockAsync(item.Id, delta)
-            : await _itemService.RemoveStockAsync(item.Id, -delta);
-
-        if (ok)
-        {
-            item.Quantity += delta;
-            Items[Items.IndexOf(item)] = item;
-            await _toast.SuccessAsync($"Stan „{item.Name}”: {item.Quantity}");
-        }
-        else
-            await _toast.ErrorAsync("Błąd aktualizacji stanu");
-    }
-
+    // ALIASY
     public Task LoadItemsAsync() => LoadAsync();
+
     public void RefreshItem(Item item)
     {
-        var ix = Items.IndexOf(item);
-        if (ix >= 0) Items[ix] = item;
+        // już niepotrzebne w tym podejściu
     }
 }
