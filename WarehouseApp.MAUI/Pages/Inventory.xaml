@@ -8,18 +8,15 @@
     x:DataType="vm:InventoryViewModel"
     Title="Magazyn">
 
-    <!-- ░░░  TOOLBAR  ░░░ -->
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Odśwież"
                      Command="{Binding LoadCommand}" />
     </ContentPage.ToolbarItems>
 
-    <!-- ░░░  CONTENT  ░░░ -->
     <ContentPage.Content>
         <ScrollView>
             <VerticalStackLayout Padding="10" Spacing="10">
 
-                <!-- Pasek z przyciskami -->
                 <HorizontalStackLayout Spacing="10">
                     <Button Text="➕ Dodaj produkt"
                             Clicked="OnAddItemClicked"
@@ -34,12 +31,11 @@
                             HorizontalOptions="FillAndExpand" />
                 </HorizontalStackLayout>
 
-                <!-- 🔍 SearchBar -->
+
                 <SearchBar Placeholder="Szukaj…"
                            Text="{Binding SearchText}"
                            CancelButtonColor="Gray" />
 
-                <!-- Lista produktów -->
                 <CollectionView ItemsSource="{Binding FilteredItems}">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="core:Item">
@@ -63,7 +59,6 @@
                                                          StringFormat='Ilość: {0}'}"
                                            FontSize="12" />
 
-                                    <!-- Przyciski +/-/🗑 -->
                                     <HorizontalStackLayout Spacing="6">
                                         <Button Text="+"
                                                 WidthRequest="45"
@@ -84,7 +79,6 @@
                                                                   Path=DeleteCommand}"
                                                 CommandParameter="{Binding .}" />
                                     </HorizontalStackLayout>
-
                                 </VerticalStackLayout>
                             </Frame>
                         </DataTemplate>

@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using WarehouseApp.MAUI.Pages;
 using WarehouseApp.MAUI.Services;
@@ -8,17 +9,20 @@ namespace WarehouseApp.MAUI;
 
 public static class MauiProgram
 {
+    public static IServiceProvider AppServices { get; private set; } = default!;
+
     public static MauiApp CreateMauiApp()
     {
         var builder = MauiApp.CreateBuilder();
 
+        /* ─────────── Podstawowa konfiguracja ─────────── */
         builder
             .UseMauiApp<App>()
-            .UseMauiCommunityToolkit()      
-            .ConfigureFonts(f =>
+            .UseMauiCommunityToolkit()
+            .ConfigureFonts(fonts =>
             {
-                f.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                f.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
 #if DEBUG
@@ -27,23 +31,33 @@ public static class MauiProgram
 
         builder.Services.AddSingleton(_ => new HttpClient
         {
-            BaseAddress = new Uri("https://testwarehouse.azurewebsites.net")
+            BaseAddress = new Uri("https://testwarehouse.azurewebsites.net") // bez /api na końcu
         });
 
-        /* ---------- DI ---------- */
-        builder.Services.AddTransient<LoginViewModel>();
-        builder.Services.AddTransient<LoginPage>();
-        builder.Services.AddTransient<RegisterViewModel>();
-        builder.Services.AddTransient<RegisterPage>(); 
+        // Serwisy
         builder.Services.AddSingleton<AuthService>();
         builder.Services.AddSingleton<ItemService>();
         builder.Services.AddSingleton<INotificationService, NotificationService>();
-        builder.Services.AddTransient<AddItemViewModel>();
-        builder.Services.AddTransient<Pages.AddItemPage>();
-        builder.Services.AddTransient<InventoryViewModel>();
-        builder.Services.AddTransient<Inventory>();
 
-        return builder.Build();
+        // ViewModel-e
+        builder.Services.AddSingleton<InventoryViewModel>();
+        builder.Services.AddTransient<AddItemViewModel>();
+        builder.Services.AddTransient<LoginViewModel>();
+        builder.Services.AddTransient<RegisterViewModel>();
+
+        // Strony
+        builder.Services.AddSingleton<Inventory>();       // magazyn
+        builder.Services.AddSingleton<ShopPage>();        // sklep
+        builder.Services.AddTransient<Pages.AddItemPage>();
+        builder.Services.AddTransient<LoginPage>();
+        builder.Services.AddTransient<RegisterPage>();
+
+        /* ─────────── Budowanie aplikacji ─────────── */
+        var app = builder.Build();
+
+        // zapamiętujemy DI dla całej aplikacji
+        AppServices = app.Services;
+
+        return app;
     }
 }
- 
