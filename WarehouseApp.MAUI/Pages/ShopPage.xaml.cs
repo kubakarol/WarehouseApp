@@ -22,7 +22,7 @@ public partial class ShopPage : ContentPage
             if (item.Quantity > 0)
             {
                 var existing = CartStore.Cart.FirstOrDefault(i => i.Item.Id == item.Id);
-                if (CartStore.Cart.Any(i => i.Item.Id == item.Id))
+                if (existing.Item != null)
                 {
                     int index = CartStore.Cart.FindIndex(i => i.Item.Id == item.Id);
                     CartStore.Cart[index] = (CartStore.Cart[index].Item, CartStore.Cart[index].Count + 1);
@@ -33,6 +33,9 @@ public partial class ShopPage : ContentPage
                 }
 
                 _viewModel.RefreshItem(item);
+
+                try { Vibration.Default.Vibrate(100); } catch { }
+
                 await DisplayAlert("Koszyk", $"Dodano: {item.Name}", "OK");
             }
             else

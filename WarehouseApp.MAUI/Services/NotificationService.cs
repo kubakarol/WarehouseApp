@@ -19,21 +19,27 @@ namespace WarehouseApp.MAUI.Services
 
         public async Task SuccessAsync(string msg)
         {
-            await Toast.Make(msg, Short, 14).Show();
-            TryVibrate(50);
+            await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                await Toast.Make(msg, Short, 14).Show();
+                TryVibrate(50);
+            });
         }
 
         public async Task ErrorAsync(string msg)
         {
-            await Toast.Make(msg, Long, 14).Show();
-            TryVibrate(300);
+            await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                await Toast.Make(msg, Long, 14).Show();
+                TryVibrate(300);
+            });
         }
 
         private static void TryVibrate(int ms)
         {
-#if ANDROID || IOS          // na Windows / Mac wyłączamy
+#if ANDROID || IOS
             try { Vibration.Default.Vibrate(TimeSpan.FromMilliseconds(ms)); }
-            catch { /* ignorujemy wszystkie błędy */ }
+            catch { }
 #endif
         }
     }

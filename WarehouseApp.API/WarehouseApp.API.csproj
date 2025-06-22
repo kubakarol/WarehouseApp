@@ -21,4 +21,8 @@
     <ProjectReference Include="..\WarehouseApp.Core\WarehouseApp.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\uploads\" />
+  </ItemGroup>
+
 </Project>

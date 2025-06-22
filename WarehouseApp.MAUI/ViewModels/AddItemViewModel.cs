@@ -34,8 +34,7 @@ public partial class AddItemViewModel : ObservableObject
     }
 
     public AddItemViewModel()
-   //     : this(new ItemService(new HttpClient { BaseAddress = new Uri("https://localhost:7073/api/") }),
-   : this(new ItemService(new HttpClient { BaseAddress = new Uri("https://10.0.2.2:7073/api/") }),
+   : this(new ItemService(new HttpClient { BaseAddress = new Uri("http://10.0.2.2:7073/api/") }),
                new NotificationService())
     { }
 
@@ -126,6 +125,8 @@ public partial class AddItemViewModel : ObservableObject
             if (!ok) throw new Exception("Serwer zwrócił błąd");
 
             await _toast.SuccessAsync("Dodano produkt");
+            try { Vibration.Default.Vibrate(100); } catch { }
+
 
             ResetFields();
 
@@ -135,6 +136,9 @@ public partial class AddItemViewModel : ObservableObject
         catch (Exception ex)
         {
             await _toast.ErrorAsync($"Błąd: {ex.Message}");
+
+            try { Vibration.Default.Vibrate(600); } catch { }
+
             System.Diagnostics.Debug.WriteLine(ex);
         }
     }
