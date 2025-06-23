@@ -18,8 +18,8 @@ namespace WarehouseApp.MAUI.Services
         {
             try
             {
-                Console.WriteLine($"[🔁] Sending login request to {BaseUrl}/auth/login");
-                Console.WriteLine($"[📦] Payload: {JsonSerializer.Serialize(new { username, password })}");
+                Console.WriteLine($"Sending login request to {BaseUrl}/auth/login");
+                Console.WriteLine($"Payload: {JsonSerializer.Serialize(new { username, password })}");
 
                 var response = await _httpClient.PostAsJsonAsync($"{BaseUrl}/auth/login", new User
                 {
@@ -27,15 +27,15 @@ namespace WarehouseApp.MAUI.Services
                     Password = password
                 });
 
-                Console.WriteLine($"[ℹ️] Response status: {response.StatusCode}");
+                Console.WriteLine($"Response status: {response.StatusCode}");
 
                 var responseBody = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"[📨] Response content: {responseBody}");
+                Console.WriteLine($"Response content: {responseBody}");
 
                 if (response.IsSuccessStatusCode)
                 {
                     var user = JsonSerializer.Deserialize<User>(responseBody);
-                    Console.WriteLine($"[✅] Login success for user: {user?.Username}");
+                    Console.WriteLine($"Login success for user: {user?.Username}");
                     return user;
                 }
 
@@ -43,7 +43,7 @@ namespace WarehouseApp.MAUI.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[‼️] Exception in login: {ex.Message}");
+                Console.WriteLine($"Exception in login: {ex.Message}");
                 return null;
             }
         }
@@ -52,20 +52,20 @@ namespace WarehouseApp.MAUI.Services
         {
             try
             {
-                Console.WriteLine($"[🔁] Sending register request to {BaseUrl}/auth/register");
-                Console.WriteLine($"[📦] Payload: {JsonSerializer.Serialize(user)}");
+                Console.WriteLine($"Sending register request to {BaseUrl}/auth/register");
+                Console.WriteLine($"Payload: {JsonSerializer.Serialize(user)}");
 
                 var response = await _httpClient.PostAsJsonAsync($"{BaseUrl}/auth/register", user);
 
-                Console.WriteLine($"[ℹ️] Response status: {response.StatusCode}");
+                Console.WriteLine($"Response status: {response.StatusCode}");
                 var responseBody = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"[📨] Response content: {responseBody}");
+                Console.WriteLine($"Response content: {responseBody}");
 
                 return response.IsSuccessStatusCode;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[‼️] Exception in register: {ex.Message}");
+                Console.WriteLine($"Exception in register: {ex.Message}");
                 return false;
             }
         }

@@ -1,5 +1,4 @@
-﻿// Services/CartStore.cs
-using WarehouseApp.Core;
+﻿using WarehouseApp.Core;
 
 namespace WarehouseApp.MAUI.Services;
 

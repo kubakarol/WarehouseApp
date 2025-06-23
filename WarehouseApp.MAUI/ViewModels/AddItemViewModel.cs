@@ -33,7 +33,6 @@ public partial class AddItemViewModel : ObservableObject
         SaveCommand = new AsyncRelayCommand(SaveAsync);
     }
 
-    // !!! BEZ BaseAddress !!!
     public AddItemViewModel()
         : this(new ItemService(new HttpClient()), new NotificationService())
     { }

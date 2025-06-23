@@ -13,13 +13,11 @@ public partial class InventoryViewModel : ObservableObject
     private readonly ItemService _itemService;
     private readonly INotificationService _toast;
 
-    // Pełna lista z API
+
     [ObservableProperty] private ObservableCollection<Item> _items = new();
 
-    // Lista filtrowana – na niej pracuje CollectionView
     [ObservableProperty] private ObservableCollection<Item> _filteredItems = new();
 
-    // Tekst z SearchBar
     [ObservableProperty] private string searchText = string.Empty;
     partial void OnSearchTextChanged(string value) => FilterItems();
 
@@ -29,14 +27,12 @@ public partial class InventoryViewModel : ObservableObject
         _toast = toast;
     }
 
-    // Konstruktor awaryjny
     public InventoryViewModel()
         : this(
             new ItemService(new HttpClient { BaseAddress = new Uri("https://testwarehouse.azurewebsites.net/api/") }),
             new NotificationService())
     { }
 
-    /* ---------- Ładowanie ---------- */
     [RelayCommand]
     public async Task LoadAsync()
     {
@@ -44,7 +40,6 @@ public partial class InventoryViewModel : ObservableObject
         FilterItems();
     }
 
-    /* ---------- Zmiana stanu ---------- */
     [RelayCommand] public Task IncreaseAsync(Item item) => ChangeStockAsync(item, +1);
     [RelayCommand] public Task DecreaseAsync(Item item) => ChangeStockAsync(item, -1);
 
@@ -56,15 +51,15 @@ public partial class InventoryViewModel : ObservableObject
 
         if (ok)
         {
-            item.Quantity += delta;   // aktualizacja lokalna
-            FilterItems();            // odśwież widok
+            item.Quantity += delta;   
+            FilterItems();            
             await _toast.SuccessAsync($"Stan „{item.Name}”: {item.Quantity}");
         }
         else
             await _toast.ErrorAsync("Błąd aktualizacji stanu");
     }
 
-    /* ---------- Usuwanie ---------- */
+ 
     [RelayCommand]
     public async Task DeleteAsync(Item item)
     {
@@ -78,7 +73,7 @@ public partial class InventoryViewModel : ObservableObject
             await _toast.ErrorAsync("Nie udało się usunąć");
     }
 
-    /* ---------- Filtrowanie ---------- */
+
     private void FilterItems()
     {
         if (string.IsNullOrWhiteSpace(SearchText))
@@ -95,6 +90,6 @@ public partial class InventoryViewModel : ObservableObject
         FilteredItems = new ObservableCollection<Item>(filtered);
     }
 
-    /* ---------- Alias dla starego kodu ---------- */
+
     public Task LoadItemsAsync() => LoadAsync();
 }

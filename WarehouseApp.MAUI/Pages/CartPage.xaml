@@ -14,7 +14,6 @@
 
             <CollectionView x:Name="CartView"
                             HeightRequest="500">
-                <!-- 👈 wysokość obowiązkowa w ScrollView -->
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="vm:CartItemViewModel">
                         <Frame BorderColor="LightGray" CornerRadius="10" Padding="10" Margin="5">

@@ -32,12 +32,10 @@ namespace WarehouseApp.MAUI.ViewModels
                 return;
             }
 
-            // zapis danych użytkownika lokalnie
             Preferences.Set("UserId", user.Id);
             Preferences.Set("Username", user.Username);
             Preferences.Set("Role", user.Role);
 
-            // przełącz na odpowiedni widok
             if (user.Role == "Employee")
                 await Shell.Current.GoToAsync("//InventoryPage");
             else

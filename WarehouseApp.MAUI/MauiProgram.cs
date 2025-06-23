@@ -15,7 +15,6 @@ public static class MauiProgram
     {
         var builder = MauiApp.CreateBuilder();
 
-        /* ─────────── Podstawowa konfiguracja ─────────── */
         builder
             .UseMauiApp<App>()
             .UseMauiCommunityToolkit()
@@ -31,7 +30,7 @@ public static class MauiProgram
 
         builder.Services.AddSingleton(_ => new HttpClient
         {
-            BaseAddress = new Uri("https://testwarehouse.azurewebsites.net") // bez /api na końcu
+            BaseAddress = new Uri("https://testwarehouse.azurewebsites.net")
         });
 
         // Serwisy
@@ -46,16 +45,15 @@ public static class MauiProgram
         builder.Services.AddTransient<RegisterViewModel>();
 
         // Strony
-        builder.Services.AddSingleton<Inventory>();       // magazyn
-        builder.Services.AddSingleton<ShopPage>();        // sklep
+        builder.Services.AddSingleton<Inventory>();       
+        builder.Services.AddSingleton<ShopPage>();        
         builder.Services.AddTransient<Pages.AddItemPage>();
         builder.Services.AddTransient<LoginPage>();
         builder.Services.AddTransient<RegisterPage>();
 
-        /* ─────────── Budowanie aplikacji ─────────── */
+
         var app = builder.Build();
 
-        // zapamiętujemy DI dla całej aplikacji
         AppServices = app.Services;
 
         return app;

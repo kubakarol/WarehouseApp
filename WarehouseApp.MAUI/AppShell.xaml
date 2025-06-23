@@ -6,17 +6,17 @@
     xmlns:pages="clr-namespace:WarehouseApp.MAUI.Pages"
     Title="WarehouseApp">
 
-    <!-- ekrany logowania -->
+
     <ShellContent Route="LoginPage"    ContentTemplate="{DataTemplate pages:LoginPage}" />
     <ShellContent Route="RegisterPage" ContentTemplate="{DataTemplate pages:RegisterPage}" />
 
-    <!-- magazyn -->
+
     <ShellContent Route="InventoryPage" ContentTemplate="{DataTemplate pages:Inventory}" />
 
-    <!-- dodawanie produktu  (Route = AddItemPage !) -->
+
     <ShellContent Route="AddItemPage"  ContentTemplate="{DataTemplate pages:AddItemPage}" />
 
-    <!-- pozostałe -->
+  
     <ShellContent Route="ShopPage" ContentTemplate="{DataTemplate pages:ShopPage}" />
     <ShellContent Route="CartPage" ContentTemplate="{DataTemplate pages:CartPage}" />
 

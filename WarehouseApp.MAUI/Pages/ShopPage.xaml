@@ -9,7 +9,6 @@
     <ScrollView>
         <VerticalStackLayout Padding="10" Spacing="10">
 
-            <!-- Górny pasek przycisków -->
             <HorizontalStackLayout Spacing="10">
                 <Button Text="🚪 Wyloguj"
                         Clicked="OnLogoutClicked"
@@ -24,10 +23,9 @@
                         HorizontalOptions="FillAndExpand" />
             </HorizontalStackLayout>
 
-            <!-- Lista produktów -->
+
             <CollectionView ItemsSource="{Binding Items}"
                             HeightRequest="600">
-                <!-- ✅ KONIECZNIE ustalona wysokość -->
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="core:Item">
                         <Frame BorderColor="LightGray" CornerRadius="8" Padding="10" Margin="10">

@@ -8,8 +8,7 @@
     Title="Dodaj produkt"
     Shell.NavBarIsVisible="True">
 
-    <!-- (opcjonalnie) własny przycisk Cofnij.  
-         Możesz usunąć, wtedy zostanie tylko systemowa strzałka. -->
+
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Cofnij"
                      Order="Primary"

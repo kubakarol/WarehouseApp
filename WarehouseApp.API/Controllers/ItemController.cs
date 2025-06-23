@@ -102,7 +102,7 @@ public class ItemController : ControllerBase
         return NoContent();
     }
 
-    // ➕ Zwiększanie stanu
+
     [HttpPut("{id}/add/{qty}")]
     public async Task<IActionResult> AddStock(int id, int qty)
     {
@@ -114,7 +114,6 @@ public class ItemController : ControllerBase
         return NoContent();
     }
 
-    // ➖ Zmniejszanie stanu
     [HttpPut("{id}/remove/{qty}")]
     public async Task<IActionResult> RemoveStock(int id, int qty)
     {

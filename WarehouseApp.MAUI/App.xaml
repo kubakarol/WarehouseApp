@@ -11,9 +11,7 @@
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Tu dokładamy inne zasoby -->
-
-
+            
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -6,7 +6,6 @@ namespace WarehouseApp.MAUI.Services
     public class ItemService
     {
         private readonly HttpClient _http;
-        // Tylko Azure!
         private const string Base = "https://testwarehouse.azurewebsites.net/api/Item";
 
         public ItemService(HttpClient http) => _http = http;
@@ -29,7 +28,6 @@ namespace WarehouseApp.MAUI.Services
         public async Task<bool> RemoveStockAsync(int id, int qty) =>
             (await _http.PutAsync($"{Base}/{id}/remove/{qty}", null)).IsSuccessStatusCode;
 
-        // 🔁 ALIASY do starego kodu
         public Task<bool> AddItemAsync(MultipartFormDataContent body) => AddAsync(body);
         public Task UpdateItemAsync(Item item) => UpdateAsync(item);
     }
